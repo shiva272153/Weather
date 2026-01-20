@@ -1,4 +1,5 @@
 const searchBtn = document.getElementById('search-btn');
+const locationBtn = document.getElementById('location-btn');
 const cityInput = document.getElementById('city-input');
 const weatherCard = document.getElementById('weather-card');
 const errorMessage = document.getElementById('error-message');
@@ -17,6 +18,23 @@ searchBtn.addEventListener('click', () => {
     }
 });
 
+locationBtn.addEventListener('click', () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                getWeather(null, latitude, longitude);
+            },
+            (error) => {
+                showError('Unable to retrieve your location. Please ensure location services are enabled.');
+                console.error('Geolocation error:', error);
+            }
+        );
+    } else {
+        showError('Geolocation is not supported by your browser.');
+    }
+});
+
 cityInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         const city = cityInput.value.trim();
@@ -26,19 +44,28 @@ cityInput.addEventListener('keypress', (e) => {
     }
 });
 
-async function getWeather(city) {
+async function getWeather(city, lat = null, lon = null) {
     try {
         // Reset UI
         errorMessage.style.display = 'none';
         weatherCard.style.display = 'none';
 
-        const response = await fetch(`/api/weather?city=${city}`);
+        let url = '/api/weather';
+        if (city) {
+            url += `?city=${encodeURIComponent(city)}`;
+        } else if (lat && lon) {
+            url += `?lat=${lat}&lon=${lon}`;
+        } else {
+            return;
+        }
+
+        const response = await fetch(url);
         const data = await response.json();
 
         if (response.ok) {
             displayWeather(data);
         } else {
-            showError(data.error || 'City not found');
+            showError(data.error || 'Weather data not found');
         }
     } catch (error) {
         showError('Something went wrong. Please try again.');
