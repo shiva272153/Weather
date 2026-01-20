@@ -306,6 +306,78 @@ header h1 {
     letter-spacing: 0.5px;
 }
 
+/* Forecast Section */
+.forecast-container {
+    margin-top: 20px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    padding: 15px;
+    animation: fadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.forecast-container h3 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    font-weight: 500;
+    opacity: 0.9;
+    text-align: left;
+    padding-left: 5px;
+}
+
+.forecast-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding-bottom: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.forecast-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.forecast-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.forecast-scroll::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+}
+
+.forecast-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 70px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 15px;
+    transition: background 0.2s;
+}
+
+.forecast-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.forecast-time {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-bottom: 5px;
+}
+
+.forecast-item img {
+    width: 40px;
+    height: 40px;
+    margin: 5px 0;
+}
+
+.forecast-temp {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
 /* Error Message */
 .error {
     color: var(--error-text);

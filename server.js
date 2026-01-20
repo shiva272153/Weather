@@ -62,6 +62,33 @@ app.get('/api/weather', async (req, res) => {
     }
 });
 
+app.get('/api/forecast', async (req, res) => {
+    const { city, lat, lon } = req.query;
+
+    if (!city && (!lat || !lon)) {
+        return res.status(400).json({ error: 'City name or coordinates are required' });
+    }
+
+    try {
+        let url;
+        if (city) {
+            url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${process.env.WEATHER_API_KEY}&units=metric`;
+        } else {
+            url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${process.env.WEATHER_API_KEY}&units=metric`;
+        }
+        const response = await axios.get(url);
+        res.json(response.data);
+    } catch (error) {
+        if (error.response) {
+            res.status(error.response.status).json({ error: error.response.data.message });
+        } else if (error.request) {
+            res.status(500).json({ error: 'No response received from weather service' });
+        } else {
+            res.status(500).json({ error: 'Error fetching forecast data' });
+        }
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -3,6 +3,8 @@ const locationBtn = document.getElementById('location-btn');
 const cityInput = document.getElementById('city-input');
 const weatherCard = document.getElementById('weather-card');
 const errorMessage = document.getElementById('error-message');
+const forecastContainer = document.getElementById('forecast-container');
+const forecastScroll = document.getElementById('forecast-scroll');
 
 const tempEl = document.getElementById('temp');
 const descEl = document.getElementById('description');
@@ -59,11 +61,14 @@ async function getWeather(city, lat = null, lon = null) {
             return;
         }
 
+        // Fetch current weather
         const response = await fetch(url);
         const data = await response.json();
 
         if (response.ok) {
             displayWeather(data);
+            // Fetch forecast
+            getForecast(city, lat, lon);
         } else {
             showError(data.error || 'Weather data not found');
         }
@@ -86,7 +91,53 @@ function displayWeather(data) {
     weatherCard.style.display = 'block';
 }
 
+async function getForecast(city, lat, lon) {
+    try {
+        let url = '/api/forecast';
+        if (city) {
+            url += `?city=${encodeURIComponent(city)}`;
+        } else if (lat && lon) {
+            url += `?lat=${lat}&lon=${lon}`;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (response.ok) {
+            displayForecast(data);
+        } else {
+            console.error('Forecast data not found');
+        }
+    } catch (error) {
+        console.error('Error fetching forecast:', error);
+    }
+}
+
+function displayForecast(data) {
+    forecastScroll.innerHTML = '';
+    // Get the next 8 items (approx 24 hours)
+    const list = data.list.slice(0, 8);
+
+    list.forEach(item => {
+        const time = new Date(item.dt * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const iconCode = item.weather[0].icon;
+        const temp = Math.round(item.main.temp);
+
+        const itemEl = document.createElement('div');
+        itemEl.classList.add('forecast-item');
+        itemEl.innerHTML = `
+            <span class="forecast-time">${time}</span>
+            <img src="https://openweathermap.org/img/wn/${iconCode}.png" alt="Weather Icon">
+            <span class="forecast-temp">${temp}°C</span>
+        `;
+        forecastScroll.appendChild(itemEl);
+    });
+
+    forecastContainer.style.display = 'block';
+}
+
 function showError(message) {
     errorMessage.textContent = message;
     errorMessage.style.display = 'block';
+    forecastContainer.style.display = 'none';
 }
